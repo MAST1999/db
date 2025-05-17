@@ -17,8 +17,7 @@
   ],
   "packageManager": "pnpm@10.6.3",
   "dependencies": {
-    "@tanstack/db": "workspace:*",
-    "@tanstack/solid-store": "^0.7.0"
+    "@tanstack/db": "workspace:*"
   },
   "devDependencies": {
     "@electric-sql/client": "1.0.0",
