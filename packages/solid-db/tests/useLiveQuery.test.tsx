@@ -1,16 +1,11 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import mitt from "mitt"
 import { renderHook } from "@solidjs/testing-library"
 import { Collection, createTransaction } from "@tanstack/db"
-import { createEffect, createRoot, createSignal } from "solid-js"
+import { createEffect, createSignal } from "solid-js"
 import { useLiveQuery } from "../src/useLiveQuery"
 import type { Accessor } from "solid-js"
-import type {
-  Context,
-  InitialQueryBuilder,
-  PendingMutation,
-  Schema,
-} from "@tanstack/db"
+import type { PendingMutation } from "@tanstack/db"
 
 type Person = {
   id: string
@@ -517,23 +512,21 @@ describe(`Query Collections`, () => {
       { initialProps: [{ minAge }] }
     )
 
-    await waitForChanges()
+    function getMinAgeFromUseLiveQueryOwner() {
+      return owner?.owned
+        ?.find((o) => o.name === `CompiledQueryMemo`)
+        ?.sources?.at(0)?.value
+    }
 
-    const resetQueryEffect = owner?.owned?.find(
-      (o) => o.name === `ResetQueryEffect`
-    )
-    const initialRun = resetQueryEffect?.updatedAt
-
-    expect(initialRun).toBeGreaterThan(0)
+    const initialMinAge = getMinAgeFromUseLiveQueryOwner()
+    expect(initialMinAge).toBe(30)
 
     // Change the parameter
     setMinAge(25)
 
-    await waitForChanges()
-
     // Old query should be stopped and new query created
-    const secondaryRun = resetQueryEffect?.updatedAt
-    expect(secondaryRun).toBeGreaterThan(initialRun!)
+    const updatedMinAge = getMinAgeFromUseLiveQueryOwner()
+    expect(updatedMinAge).toBe(25)
   })
 
   it(`should be able to query a result collection`, async () => {
