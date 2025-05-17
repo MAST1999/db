@@ -1,13 +1,8 @@
 import { describe, expect, it } from "vitest"
 import mitt from "mitt"
-import { renderHook, waitFor } from "@solidjs/testing-library"
+import { renderHook } from "@solidjs/testing-library"
 import { Collection, createTransaction } from "@tanstack/db"
-import {
-  createEffect,
-  createResource,
-  createRoot,
-  createSignal,
-} from "solid-js"
+import { createEffect, createRoot, createSignal } from "solid-js"
 import { useLiveQuery } from "../src/useLiveQuery"
 import type { Accessor } from "solid-js"
 import type { PendingMutation } from "@tanstack/db"
@@ -78,7 +73,7 @@ const initialIssues: Array<Issue> = [
 
 describe(`Query Collections`, () => {
   it(`should be able to query a collection`, () =>
-    createRoot(() => {
+    createRoot((dispose) => {
       const emitter = mitt()
 
       // Create collection with mutation capability
@@ -218,10 +213,12 @@ describe(`Query Collections`, () => {
         id: `3`,
         name: `John Smith`,
       })
+
+      dispose()
     }))
 
   it(`should join collections and return combined results`, () =>
-    createRoot(() => {
+    createRoot((dispose) => {
       const emitter = mitt()
 
       // Create person collection
@@ -368,10 +365,12 @@ describe(`Query Collections`, () => {
 
       // After deletion, user 3 should no longer have a joined result
       expect(result.state().get(`3`)).toBeUndefined()
+
+      dispose()
     }))
 
   it(`should recompile query when parameters change and change results`, () =>
-    createRoot(() => {
+    createRoot((dispose) => {
       const emitter = mitt()
 
       // Create collection with mutation capability
@@ -453,10 +452,12 @@ describe(`Query Collections`, () => {
 
       // Should now be empty
       expect(result.state().size).toBe(0)
+
+      dispose()
     }))
 
   it(`should stop old query when parameters change`, () =>
-    createRoot(() => {
+    createRoot((dispose) => {
       const emitter = mitt()
 
       // Create collection with mutation capability
@@ -518,10 +519,12 @@ describe(`Query Collections`, () => {
       // Old query should be stopped and new query created
       const updatedMinAge = getMinAgeFromUseLiveQueryOwner()
       expect(updatedMinAge).toBe(25)
+
+      dispose()
     }))
 
   it(`should be able to query a result collection`, () =>
-    createRoot(() => {
+    createRoot((dispose) => {
       const emitter = mitt()
 
       // Create collection with mutation capability
@@ -623,10 +626,12 @@ describe(`Query Collections`, () => {
         team: `team2`,
         count: 1,
       })
+
+      dispose()
     }))
 
   it(`optimistic state is dropped after commit`, () =>
-    createRoot(() => {
+    createRoot((dispose) => {
       const emitter = mitt()
       // Track renders and states
       const renderStates: Array<{
@@ -790,5 +795,7 @@ describe(`Query Collections`, () => {
           title: `New Issue`,
         })
       })
+
+      dispose()
     }))
 })
