@@ -1,6 +1,5 @@
 import { compileQuery, queryBuilder } from "@tanstack/db"
 import { createEffect, createMemo } from "solid-js"
-import { useStore } from "@tanstack/solid-store"
 import type { Accessor } from "solid-js"
 import type {
   Collection,
@@ -35,8 +34,8 @@ export function useLiveQuery<
     { name: `CompiledQueryMemo` }
   )
 
-  const state = () => useStore(compiledQuery().results.derivedState)()
-  const data = () => useStore(compiledQuery().results.derivedArray)()
+  const state = () => compiledQuery().results.derivedState.state
+  const data = () => compiledQuery().results.derivedArray.state
 
   // Clean up on unmount
   createEffect(
