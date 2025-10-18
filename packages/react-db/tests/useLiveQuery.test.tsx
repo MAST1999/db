@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest"
-import { act, renderHook, waitFor } from "@testing-library/react"
+import {
+  act,
+  render,
+  renderHook,
+  waitFor,
+  screen,
+} from "@testing-library/react"
 import {
   Query,
   count,
@@ -10,7 +16,7 @@ import {
   gt,
   lte,
 } from "@tanstack/db"
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { useLiveQuery } from "../src/useLiveQuery"
 import { mockSyncCollectionOptions } from "../../db/tests/utils"
 
@@ -2347,6 +2353,113 @@ describe(`Query Collections`, () => {
       expect(result.current.data).toBeUndefined()
       expect(result.current.status).toBe(`disabled`)
       expect(result.current.isEnabled).toBe(false)
+    })
+  })
+
+  describe.only(`React Suspense integration`, () => {
+    it.only(`should suspend while loading and render when ready`, async () => {
+      let syncBegin: (() => void) | undefined
+      let syncCommit: (() => void) | undefined
+      let syncMarkReady: (() => void) | undefined
+
+      // Create a collection that doesn't auto-start syncing
+      const collection = createCollection<Person>({
+        id: `suspense-test`,
+        getKey: (person: Person) => person.id,
+        startSync: false,
+        sync: {
+          sync: ({ begin, commit, markReady }) => {
+            syncBegin = begin
+            syncCommit = commit
+            syncMarkReady = markReady
+
+            begin()
+            commit()
+            markReady()
+          },
+        },
+        onInsert: async () => {},
+        onUpdate: async () => {},
+        onDelete: async () => {},
+      })
+
+      // Test component that uses useLiveQuery
+      function TestComponent() {
+        const result = useLiveQuery(
+          (q) =>
+            q
+              .from({ persons: collection })
+              .where(({ persons }) => gt(persons.age, 30))
+              .select(({ persons }) => ({
+                id: persons.id,
+                name: persons.name,
+                age: persons.age,
+              })),
+          [],
+          // @ts-ignore
+          { suspense: true }
+        )
+
+        return (
+          <div data-testid="content">
+            {result.data?.map((person) => (
+              <div key={person.id} data-testid={`person-${person.id}`}>
+                {person.name} (age: {person.age})
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      // Render with Suspense boundary
+      const { unmount } = render(
+        <Suspense fallback={<div data-testid="loading">Loading...</div>}>
+          <TestComponent />
+        </Suspense>
+      )
+
+      // Initially should show loading fallback
+      expect(screen.getByTestId("loading")).toBeInTheDocument()
+      expect(screen.queryByTestId("content")).not.toBeInTheDocument()
+
+      // Add data and commit
+      await act(async () => {
+        syncBegin!()
+        collection.insert({
+          id: `1`,
+          name: `John Smith`,
+          age: 35,
+          email: `john.smith@example.com`,
+          isActive: true,
+          team: `team1`,
+        })
+        collection.insert({
+          id: `2`,
+          name: `Jane Doe`,
+          age: 25,
+          email: `jane.doe@example.com`,
+          isActive: true,
+          team: `team2`,
+        })
+        syncCommit!()
+        syncMarkReady!()
+      })
+
+      // Should now render the content
+      await waitFor(() => {
+        console.log(collection.status)
+        expect(screen.getByTestId("content")).toBeInTheDocument()
+        expect(screen.queryByTestId("loading")).not.toBeInTheDocument()
+      })
+
+      // Should only show John Smith (age > 30)
+      expect(screen.getByTestId("person-1")).toBeInTheDocument()
+      expect(screen.getByTestId("person-1")).toHaveTextContent(
+        "John Smith (age: 35)"
+      )
+      expect(screen.queryByTestId("person-2")).not.toBeInTheDocument()
+
+      unmount()
     })
   })
 })

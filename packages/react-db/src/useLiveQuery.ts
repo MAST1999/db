@@ -1,4 +1,4 @@
-import { useRef, useSyncExternalStore } from "react"
+import { use, useRef, useSyncExternalStore } from "react"
 import {
   BaseQueryBuilder,
   CollectionImpl,
@@ -315,7 +315,8 @@ export function useLiveQuery<
 // Implementation - use function overloads to infer the actual collection type
 export function useLiveQuery(
   configOrQueryOrCollection: any,
-  deps: Array<unknown> = []
+  deps: Array<unknown> = [],
+  opts: { suspense: boolean } = { suspense: false }
 ) {
   // Check if it's already a collection by checking for specific collection methods
   const isCollection =
@@ -407,6 +408,15 @@ export function useLiveQuery(
     versionRef.current = 0
     snapshotRef.current = null
   }
+
+  // Use React's use() to enable Suspense support for collection preloading
+  // Only call use() if the collection exists
+  if (collectionRef.current && opts.suspense === true) {
+    console.log("***** HERE *******")
+    use(collectionRef.current.preload())
+  }
+
+  console.log("******* WOW *******")
 
   // Create stable subscribe function using ref
   const subscribeRef = useRef<
