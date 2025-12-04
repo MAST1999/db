@@ -5,7 +5,7 @@ title: UnknownHavingExpressionTypeError
 
 # Class: UnknownHavingExpressionTypeError
 
-Defined in: [packages/db/src/errors.ts:564](https://github.com/TanStack/db/blob/main/packages/db/src/errors.ts#L564)
+Defined in: [packages/db/src/errors.ts:564](https://github.com/MAST1999/db/blob/main/packages/db/src/errors.ts#L564)
 
 ## Extends
 
@@ -19,7 +19,7 @@ Defined in: [packages/db/src/errors.ts:564](https://github.com/TanStack/db/blob/
 new UnknownHavingExpressionTypeError(type): UnknownHavingExpressionTypeError;
 ```
 
-Defined in: [packages/db/src/errors.ts:565](https://github.com/TanStack/db/blob/main/packages/db/src/errors.ts#L565)
+Defined in: [packages/db/src/errors.ts:565](https://github.com/MAST1999/db/blob/main/packages/db/src/errors.ts#L565)
 
 #### Parameters
 
