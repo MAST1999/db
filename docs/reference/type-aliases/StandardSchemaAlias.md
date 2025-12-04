@@ -9,7 +9,7 @@ title: StandardSchemaAlias
 type StandardSchemaAlias<T> = StandardSchema<T>;
 ```
 
-Defined in: [packages/db/src/types.ts:348](https://github.com/TanStack/db/blob/main/packages/db/src/types.ts#L348)
+Defined in: [packages/db/src/types.ts:348](https://github.com/MAST1999/db/blob/main/packages/db/src/types.ts#L348)
 
 Type alias for StandardSchema
 

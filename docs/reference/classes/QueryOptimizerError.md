@@ -5,7 +5,7 @@ title: QueryOptimizerError
 
 # Class: QueryOptimizerError
 
-Defined in: [packages/db/src/errors.ts:628](https://github.com/TanStack/db/blob/main/packages/db/src/errors.ts#L628)
+Defined in: [packages/db/src/errors.ts:628](https://github.com/MAST1999/db/blob/main/packages/db/src/errors.ts#L628)
 
 ## Extends
 
@@ -24,7 +24,7 @@ Defined in: [packages/db/src/errors.ts:628](https://github.com/TanStack/db/blob/
 new QueryOptimizerError(message): QueryOptimizerError;
 ```
 
-Defined in: [packages/db/src/errors.ts:629](https://github.com/TanStack/db/blob/main/packages/db/src/errors.ts#L629)
+Defined in: [packages/db/src/errors.ts:629](https://github.com/MAST1999/db/blob/main/packages/db/src/errors.ts#L629)
 
 #### Parameters
 
